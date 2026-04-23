@@ -23,3 +23,8 @@ The editor/platform used for developing this task was Visual Studio Code. VS Cod
 This task can be applicable in many real-world areas. It can be used on entertainment websites where users search for movies before watching them. It can be useful for OTT platforms like Netflix, Amazon Prime Video, or Disney+ Hotstar to help users discover content. It can also be used in cinema booking websites where users check movie details before booking tickets. Students can use this project for learning API integration, web development, and JavaScript DOM manipulation. It can also be extended further by adding features like watchlists, favorites, trailers, reviews, dark mode, or login systems.
 
 Overall, this task is a practical example of combining design, programming, and real-time data integration to build an interactive web application. It is useful for learning as well as real-world implementation in the entertainment industry.
+
+#OUTPUT
+
+<img width="1600" height="854" alt="Image" src="https://github.com/user-attachments/assets/8dcfde55-2c35-4983-9cf5-85b409674977" />
+<img width="1600" height="855" alt="Image" src="https://github.com/user-attachments/assets/9a3f6b34-2874-4f83-a642-c97b0f620b5f" />
