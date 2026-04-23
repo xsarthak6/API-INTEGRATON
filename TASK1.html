@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineQuest — Movie & Series Explorer</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#f4f4f4;color:#111;min-height:100vh}
+    .app{max-width:900px;margin:0 auto;padding:1.5rem 1rem}
+    .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-icon{width:36px;height:36px;background:#cc4a1c;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
+    .logo-name{font-size:22px;font-weight:700;letter-spacing:-.3px;color:#111}
+    .logo-name span{color:#cc4a1c}
+    .logo-tag{font-size:11px;color:#888;margin-top:1px}
+    .badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{background:#cc4a1c;color:#fff;font-size:11px;padding:3px 10px;border-radius:4px;font-weight:600;letter-spacing:.4px}
+    .badge2{background:#1a6e3c;color:#fff;font-size:11px;padding:3px 10px;border-radius:4px;font-weight:600;letter-spacing:.4px}
+    .search-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+    .search-row input{flex:1;min-width:180px;padding:10px 14px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;font-size:14px}
+    .search-row select{padding:10px 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#111;font-size:14px}
+    .search-row button{padding:10px 22px;background:#cc4a1c;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600}
+    .search-row button:hover{background:#b03e16}
+    .error{background:#fff0f0;border:1px solid #f5c1c1;color:#a32d2d;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem}
+    .spinner{width:28px;height:28px;border:3px solid #ddd;border-top-color:#cc4a1c;border-radius:50%;animation:spin .7s linear infinite;margin:3rem auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .results-meta{font-size:12px;color:#888;margin-bottom:10px}
+    .movies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+    .movie-card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .2s,border-color .2s}
+    .movie-card:hover{border-color:#aaa;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .movie-poster{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#eee}
+    .poster-placeholder{width:100%;aspect-ratio:2/3;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:36px;color:#bbb}
+    .movie-info{padding:10px}
+    .movie-title{font-size:13px;font-weight:600;line-height:1.4;color:#111}
+    .movie-year{font-size:11px;color:#888;margin-top:3px}
+    .movie-type{font-size:10px;background:#f0f0f0;border-radius:3px;padding:1px 6px;display:inline-block;margin-top:4px;color:#555;text-transform:capitalize}
+    /* Modal */
+    .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
+    .detail-card{background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto}
+    .detail-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 0}
+    .detail-header span{font-size:12px;color:#888}
+    .close-btn{background:none;border:none;font-size:20px;cursor:pointer;color:#888;padding:2px 8px;line-height:1}
+    .close-btn:hover{color:#111}
+    .detail-top{display:flex;gap:14px;padding:14px 16px}
+    .detail-poster{width:95px;flex-shrink:0;border-radius:8px;overflow:hidden}
+    .detail-poster img{width:100%;display:block}
+    .detail-poster-ph{width:95px;height:142px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:30px;color:#bbb}
+    .detail-meta{flex:1}
+    .detail-title{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:8px;color:#111}
+    .detail-row{font-size:12px;color:#555;margin-bottom:4px}
+    .detail-row strong{color:#111;font-weight:600}
+    .rating-pill{display:inline-flex;align-items:center;gap:4px;background:#fff8e1;color:#7a5c00;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;border:1px solid #ffe082}
+    .detail-plot{padding:12px 16px 16px;font-size:13px;color:#444;line-height:1.7;border-top:1px solid #eee}
+    .empty{text-align:center;padding:3rem 1rem;color:#aaa;font-size:14px}
+    .footer-note{font-size:11px;color:#aaa;text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0}
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🎬</div>
+      <div>
+        <div class="logo-name">Cine<span>Quest</span></div>
+        <div class="logo-tag">movie &amp; series explorer</div>
+      </div>
+    </div>
+    <div class="badges">
+      <div class="badge">TASK 1</div>
+      <div class="badge2">MOVIE API</div>
+    </div>
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="movieInput" placeholder="Search movies, series... (e.g. Inception, Batman)" value="Avengers" />
+    <select id="typeSelect">
+      <option value="">All</option>
+      <option value="movie">Movies</option>
+      <option value="series">Series</option>
+      <option value="episode">Episodes</option>
+    </select>
+    <button onclick="searchMovies()">Search</button>
+  </div>
+
+  <div id="errorBox" style="display:none" class="error"></div>
+  <div id="resultsMeta" class="results-meta"></div>
+  <div id="moviesContainer"><div class="empty">Search for any movie or series above</div></div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detailOverlay" style="display:none" class="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-card">
+    <div class="detail-header">
+      <span>Movie details</span>
+      <button class="close-btn" onclick="document.getElementById('detailOverlay').style.display='none'">✕</button>
+    </div>
+    <div class="detail-top" id="detailTop"></div>
+    <div class="detail-plot" id="detailPlot"></div>
+  </div>
+</div>
+
+<script>
+  const OMDB_KEY = '81486f64';
+
+  async function searchMovies() {
+    const q = document.getElementById('movieInput').value.trim();
+    const type = document.getElementById('typeSelect').value;
+    if (!q) return;
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('resultsMeta').textContent = '';
+    document.getElementById('moviesContainer').innerHTML = '<div class="spinner"></div>';
+    try {
+      let url = `https://www.omdbapi.com/?s=${encodeURIComponent(q)}&apikey=${OMDB_KEY}`;
+      if (type) url += `&type=${type}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.Response === 'False') throw new Error(data.Error || 'No results found');
+      document.getElementById('resultsMeta').textContent = `${data.totalResults} results found for "${q}"`;
+      renderMovies(data.Search);
+    } catch (e) {
+      document.getElementById('moviesContainer').innerHTML = '';
+      const eb = document.getElementById('errorBox');
+      eb.textContent = e.message;
+      eb.style.display = 'block';
+    }
+  }
+
+  function renderMovies(movies) {
+    const grid = document.createElement('div');
+    grid.className = 'movies-grid';
+    movies.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'movie-card';
+      const hasPoster = m.Poster && m.Poster !== 'N/A';
+      card.innerHTML = `
+        ${hasPoster ? `<img class="movie-poster" src="${m.Poster}" alt="${m.Title}" loading="lazy"/>` : `<div class="poster-placeholder">🎬</div>`}
+        <div class="movie-info">
+          <div class="movie-title">${m.Title}</div>
+          <div class="movie-year">${m.Year}</div>
+          <div class="movie-type">${m.Type}</div>
+        </div>`;
+      card.onclick = () => fetchDetail(m.imdbID);
+      grid.appendChild(card);
+    });
+    document.getElementById('moviesContainer').innerHTML = '';
+    document.getElementById('moviesContainer').appendChild(grid);
+  }
+
+  async function fetchDetail(id) {
+    document.getElementById('detailOverlay').style.display = 'flex';
+    document.getElementById('detailTop').innerHTML = '<div class="spinner" style="margin:1.5rem auto"></div>';
+    document.getElementById('detailPlot').innerHTML = '';
+    try {
+      const res = await fetch(`https://www.omdbapi.com/?i=${id}&plot=full&apikey=${OMDB_KEY}`);
+      const d = await res.json();
+      if (d.Response === 'False') throw new Error('Details not available');
+      const hasPoster = d.Poster && d.Poster !== 'N/A';
+      document.getElementById('detailTop').innerHTML = `
+        ${hasPoster ? `<div class="detail-poster"><img src="${d.Poster}" alt="${d.Title}"/></div>` : `<div class="detail-poster-ph">🎬</div>`}
+        <div class="detail-meta">
+          <div class="detail-title">${d.Title}</div>
+          <div class="detail-row"><strong>Year:</strong> ${d.Year}</div>
+          <div class="detail-row"><strong>Genre:</strong> ${d.Genre}</div>
+          <div class="detail-row"><strong>Director:</strong> ${d.Director}</div>
+          <div class="detail-row"><strong>Cast:</strong> ${d.Actors}</div>
+          <div class="detail-row"><strong>Runtime:</strong> ${d.Runtime}</div>
+          ${d.imdbRating !== 'N/A' ? `<div class="rating-pill">⭐ ${d.imdbRating} / 10 IMDb</div>` : ''}
+        </div>`;
+      document.getElementById('detailPlot').textContent = d.Plot !== 'N/A' ? d.Plot : 'No plot available.';
+    } catch (e) {
+      document.getElementById('detailTop').innerHTML = `<p style="padding:1rem;font-size:13px;color:#a32d2d">${e.message}</p>`;
+    }
+  }
+
+  function closeDetail(e) {
+    if (e.target === document.getElementById('detailOverlay'))
+      document.getElementById('detailOverlay').style.display = 'none';
+  }
+
+  document.getElementById('movieInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchMovies();
+  });
+
+  searchMovies();
+</script>
+
+</body>
+</html>
